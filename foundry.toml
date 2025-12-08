@@ -1,0 +1,39 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.24"
+optimizer = true
+optimizer_runs = 1000000
+via_ir = false
+ffi = true
+
+# Remappings
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "@uniswap/v4-core/=lib/v4-core/",
+    "@uniswap/v4-periphery/=lib/v4-periphery/",
+    "forge-std/=lib/forge-std/src/",
+]
+
+# RPC endpoints for deployment
+[rpc_endpoints]
+base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
+base = "${BASE_MAINNET_RPC_URL}"
+localhost = "http://127.0.0.1:8545"
+
+[etherscan]
+base_sepolia = { key = "${BASESCAN_API_KEY}", chain = 84532 }
+base = { key = "${BASESCAN_API_KEY}", chain = 8453 }
+
+# Testing configuration
+[profile.test]
+fuzz = { runs = 1000 }
+
+# Gas reporting
+gas_reports = ["YieldShiftHook", "YieldOracle", "YieldRouter"]
+
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = true
