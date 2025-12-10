@@ -1,12 +1,12 @@
-// Contract addresses - UPDATE AFTER DEPLOYMENT
+// Contract addresses - DEPLOYED on Base Sepolia (Dec 9, 2025)
 export const CONTRACTS = {
-  // Base Sepolia addresses (update after deployment)
-  yieldOracle: '0x0000000000000000000000000000000000000000',
-  yieldRouter: '0x0000000000000000000000000000000000000000',
-  yieldCompound: '0x0000000000000000000000000000000000000000',
-  yieldShiftHook: '0x0000000000000000000000000000000000000000',
-  yieldShiftFactory: '0x0000000000000000000000000000000000000000',
-};
+  // Base Sepolia - VERIFIED ✅
+  yieldOracle: '0xCB5d6d80535a5F50f33C457eEf4ca2E9F712E864',
+  yieldRouter: '0x99907915Ef1836a00ce88061B75B2cfC4537B5A6',
+  yieldCompound: '0x35b95450Eaab790de5a8067064B9ce75a57d4d8f',
+  yieldShiftHook: '0xE0122CF1AbC59977a8F1DC1A02B36c678d5F40C0',
+  yieldShiftFactory: '0x3a07Ba4489d9aB8BFdc750C0cf0e41cD1f9baf46',
+} as const;
 
 // Chain configuration
 export const CHAIN_ID = 84532; // Base Sepolia

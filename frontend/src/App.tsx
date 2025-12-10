@@ -11,10 +11,10 @@ import './App.css';
 // Configure wagmi
 const config = getDefaultConfig({
   appName: 'YieldShift',
-  projectId: process.env.REACT_APP_WALLETCONNECT_PROJECT_ID || 'demo',
+  projectId: '6b87a3c69cbd8b52055d7aef763148d6', // WalletConnect Cloud Project ID
   chains: [baseSepolia],
   transports: {
-    [baseSepolia.id]: http(),
+    [baseSepolia.id]: http('https://sepolia.base.org'),
   },
 });
 
