@@ -10,6 +10,7 @@ export const CONTRACTS = {
   aaveAdapter: '0x605F80DcFd708465474E9D130b5c06202e79e2c6',
   morphoAdapter: '0xCB5d6d80535a5F50f33C457eEf4ca2E9F712E864',
   compoundAdapter: '0x99907915Ef1836a00ce88061B75B2cfC4537B5A6',
+  eigenLayerAdapter: '0xDe65fc1FF598611e4b5c23A1876A6d9D31bD5245', // NEW: EigenLayer LRTs
 } as const;
 
 // Chain configuration
@@ -163,10 +164,14 @@ export const VAULT_NAMES: Record<string, string> = {
   '0xa238dd80c259a72e81d7e4664a9801593f98d1c5': 'Aave v3 (USDC)',
   '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb': 'Morpho Blue',
   '0xb125e6687d4313864e53df431d5425969c15eb2f': 'Compound v3 (USDC)',
+  '0x76db26de9e92730c24c69717741937d084858960': 'weETH (Ether.fi)',
+  '0xa15e05954e22f795205a14f58c04c23a6bdf872e': 'ezETH (Renzo)',
   // Also support checksum addresses
   '0xA238Dd80C259a72e81d7e4664a9801593F98d1c5': 'Aave v3 (USDC)',
   '0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb': 'Morpho Blue',
   '0xb125E6687d4313864e53df431d5425969c15Eb2F': 'Compound v3 (USDC)',
+  '0x76dB26De9E92730c24C69717741937d084858960': 'weETH (Ether.fi)',
+  '0xa15E05954E22f795205A14f58C04C23a6BDF872E': 'ezETH (Renzo)',
 };
 
 // Risk score labels

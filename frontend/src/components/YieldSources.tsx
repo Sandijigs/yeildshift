@@ -16,6 +16,8 @@ const protocolMapping: Record<string, string> = {
   '0xa238dd80c259a72e81d7e4664a9801593f98d1c5': 'aave',
   '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb': 'morpho',
   '0xb125e6687d4313864e53df431d5425969c15eb2f': 'compound',
+  '0x76db26de9e92730c24c69717741937d084858960': 'eigenlayer', // weETH
+  '0xa15e05954e22f795205a14f58c04c23a6bdf872e': 'eigenlayer', // ezETH
 };
 
 const protocolLogos: Record<string, string> = {
