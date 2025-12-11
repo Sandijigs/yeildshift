@@ -1,6 +1,6 @@
 # YieldShift 🚀
 
-**The first Uniswap v4 hook that transforms every liquidity pool into an intelligent, auto-compounding yield machine.**
+**A first Uniswap v4 hook that transforms every liquidity pool into an intelligent, auto-compounding yield machine.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.24-blue)](https://soliditylang.org/)
@@ -27,20 +27,24 @@
 
 YieldShift upgrades any Uniswap v4 pool into an intelligent, multi-layer yield engine. Using `beforeSwap` and `afterSwap` hooks, it continuously routes idle liquidity into the highest-yielding opportunities — **Morpho Blue (9–14%)**, **Aave**, **Compound**, and **EigenLayer restaking vaults (6–10%)** — harvests rewards, and auto-compounds them for every LP in the background.
 
+### 🤝 Hookathon Partner Integration
+
+This project integrates **EigenLayer** for enhanced ETH yield through Liquid Restaking Tokens (LRTs). See [Partner Integrations](#-partner-integrations) section below for details.
+
 **No lockups. No wrappers. No extra transactions. LPs earn normal swap fees + 3–14% layered yield while staying 100% liquid.**
 
 ---
 
 ## ✨ Features
 
-| Feature | Description |
-|---------|-------------|
+| Feature                      | Description                                                   |
+| ---------------------------- | ------------------------------------------------------------- |
 | 🔄 **Dynamic Yield Routing** | Automatically routes idle capital to highest-yielding sources |
-| 🌾 **Auto-Compound** | Harvested rewards are swapped and added as liquidity |
-| 📊 **Live Dashboard** | Real-time monitoring of yields and pool performance |
-| ⚡ **Gas Optimized** | Efficient operations with <200k gas overhead per swap |
-| 🔐 **Emergency Controls** | Pause and emergency withdraw functionality |
-| 🎛️ **Configurable** | Pool-specific settings for shift %, APY thresholds, risk |
+| 🌾 **Auto-Compound**         | Harvested rewards are swapped and added as liquidity          |
+| 📊 **Live Dashboard**        | Real-time monitoring of yields and pool performance           |
+| ⚡ **Gas Optimized**         | Efficient operations with <200k gas overhead per swap         |
+| 🔐 **Emergency Controls**    | Pause and emergency withdraw functionality                    |
+| 🎛️ **Configurable**          | Pool-specific settings for shift %, APY thresholds, risk      |
 
 ---
 
@@ -222,6 +226,7 @@ npm run build
 ### 1. beforeSwap Hook
 
 When a swap occurs, the `beforeSwap` hook:
+
 1. Queries `YieldOracle` for current APYs across all vaults
 2. Selects the best risk-adjusted yield source
 3. If APY exceeds threshold, shifts configured % of idle capital via `YieldRouter`
@@ -229,6 +234,7 @@ When a swap occurs, the `beforeSwap` hook:
 ### 2. afterSwap Hook
 
 After each swap, the `afterSwap` hook:
+
 1. Increments swap counter
 2. If counter reaches `harvestFrequency`:
    - Harvests rewards from all active vaults
@@ -250,12 +256,12 @@ Swap → afterSwap → Harvest rewards → Compound to LP
 
 Each pool can be configured with:
 
-| Parameter | Range | Description |
-|-----------|-------|-------------|
-| `shiftPercentage` | 10-50% | % of idle capital to shift |
-| `minAPYThreshold` | ≥2% | Minimum APY to trigger shift |
-| `harvestFrequency` | 1-100 | Swaps between harvests |
-| `riskTolerance` | 1-10 | Max risk score (1=safest) |
+| Parameter          | Range  | Description                  |
+| ------------------ | ------ | ---------------------------- |
+| `shiftPercentage`  | 10-50% | % of idle capital to shift   |
+| `minAPYThreshold`  | ≥2%    | Minimum APY to trigger shift |
+| `harvestFrequency` | 1-100  | Swaps between harvests       |
+| `riskTolerance`    | 1-10   | Max risk score (1=safest)    |
 
 ---
 
@@ -271,12 +277,32 @@ Each pool can be configured with:
 
 ## 📊 Yield Sources
 
-| Protocol | Asset | Typical APY | Risk Score |
-|----------|-------|-------------|------------|
-| Morpho Blue | USDC | 9-14% | 6 (Medium) |
-| Aave v3 | USDC | 4-8% | 3 (Low) |
-| Compound v3 | USDC | 2-5% | 4 (Low-Med) |
-| EigenLayer LRTs | ETH | 6-10% | 7 (Med-High) |
+| Protocol        | Asset | Typical APY | Risk Score   |
+| --------------- | ----- | ----------- | ------------ |
+| Morpho Blue     | USDC  | 9-14%       | 6 (Medium)   |
+| Aave v3         | USDC  | 4-8%        | 3 (Low)      |
+| Compound v3     | USDC  | 2-5%        | 4 (Low-Med)  |
+| EigenLayer LRTs | ETH   | 6-10%       | 7 (Med-High) |
+
+---
+
+## 🤝 Partner Integrations
+
+This project integrates with the following Uniswap Hookathon partners:
+
+### EigenLayer
+
+- **Integration Location**: `src/adapters/EigenLayerAdapter.sol` (lines 1-321)
+- **Usage**: Integrates with EigenLayer Liquid Restaking Tokens (LRTs) including weETH (Ether.fi), ezETH (Renzo), and mETH (Mantle) for enhanced ETH yield through restaking
+- **Key Features**:
+  - Automatic yield optimization through restaking rewards (6-10% APY)
+  - Support for multiple LRT protocols
+  - Exchange rate tracking for APY calculation
+  - Seamless WETH <> LRT conversions
+- **Referenced in**:
+  - Hook implementation: `src/YieldShiftHook.sol` (yield routing via YieldRouter)
+  - Oracle integration: `src/YieldOracle.sol` (APY data aggregation)
+  - Router: `src/YieldRouter.sol` (capital allocation)
 
 ---
 
