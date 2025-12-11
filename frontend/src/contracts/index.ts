@@ -1,11 +1,15 @@
 // Contract addresses - DEPLOYED on Base Sepolia (Dec 9, 2025)
 export const CONTRACTS = {
   // Base Sepolia - VERIFIED ✅
-  yieldOracle: '0xCB5d6d80535a5F50f33C457eEf4ca2E9F712E864',
-  yieldRouter: '0x99907915Ef1836a00ce88061B75B2cfC4537B5A6',
-  yieldCompound: '0x35b95450Eaab790de5a8067064B9ce75a57d4d8f',
-  yieldShiftHook: '0xE0122CF1AbC59977a8F1DC1A02B36c678d5F40C0',
-  yieldShiftFactory: '0x3a07Ba4489d9aB8BFdc750C0cf0e41cD1f9baf46',
+  yieldOracle: '0x554dc44df2AA9c718F6388ef057282893f31C04C',
+  yieldRouter: '0xEe1fFe183002c22607E84A335d29fa2E94538ffc',
+  yieldCompound: '0x4E0C6E13eAee2C879D075c285b31272AE6b3967C',
+  yieldShiftHook: '0x4f2cD1d5Af1C5bf691133A8560eab1ACCF90C0c0',  // CREATE2 mined address
+  yieldShiftFactory: '0xD81BAd11a4710d3038E8753FF229e760E21aAE0E',
+  // Adapters
+  aaveAdapter: '0x605F80DcFd708465474E9D130b5c06202e79e2c6',
+  morphoAdapter: '0xCB5d6d80535a5F50f33C457eEf4ca2E9F712E864',
+  compoundAdapter: '0x99907915Ef1836a00ce88061B75B2cfC4537B5A6',
 } as const;
 
 // Chain configuration
@@ -154,8 +158,12 @@ export const YIELD_SHIFT_HOOK_ABI = [
   },
 ] as const;
 
-// Vault name mapping
+// Vault name mapping (lowercase for matching)
 export const VAULT_NAMES: Record<string, string> = {
+  '0xa238dd80c259a72e81d7e4664a9801593f98d1c5': 'Aave v3 (USDC)',
+  '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb': 'Morpho Blue',
+  '0xb125e6687d4313864e53df431d5425969c15eb2f': 'Compound v3 (USDC)',
+  // Also support checksum addresses
   '0xA238Dd80C259a72e81d7e4664a9801593F98d1c5': 'Aave v3 (USDC)',
   '0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb': 'Morpho Blue',
   '0xb125E6687d4313864e53df431d5425969c15Eb2F': 'Compound v3 (USDC)',

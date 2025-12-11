@@ -35,7 +35,7 @@ contract AaveAdapter is BaseAdapter {
         address vault,
         address token,
         uint256 amount
-    ) external override returns (uint256 shares) {
+    ) external override nonReentrant whenNotPaused returns (uint256 shares) {
         require(amount > 0, "AaveAdapter: Zero amount");
         
         // Transfer tokens from caller
@@ -65,7 +65,7 @@ contract AaveAdapter is BaseAdapter {
     function withdraw(
         address vault,
         uint256 shares
-    ) external override returns (uint256 amount) {
+    ) external override nonReentrant whenNotPaused returns (uint256 amount) {
         // For Aave, vault param is the asset address
         address asset = vault;
         
@@ -82,7 +82,7 @@ contract AaveAdapter is BaseAdapter {
     }
 
     /// @inheritdoc BaseAdapter
-    function harvest(address vault) external override returns (uint256 rewards) {
+    function harvest(address vault) external override nonReentrant whenNotPaused returns (uint256 rewards) {
         // Aave v3 doesn't have separate rewards to harvest in base implementation
         // Yield accrues directly to aToken balance
         // For safety rewards (e.g., stkAAVE), would need separate integration
@@ -95,10 +95,10 @@ contract AaveAdapter is BaseAdapter {
     function getAPY(address vault) external view override returns (uint256 apy) {
         // vault param is the asset address for Aave
         IAavePool.ReserveData memory reserveData = aavePool.getReserveData(vault);
-        
+
         // currentLiquidityRate is in RAY (1e27) and represents the supply APY
         // Convert from RAY to basis points
-        apy = reserveData.currentLiquidityRate.rayToBps();
+        apy = YieldMath.rayToBps(uint256(reserveData.currentLiquidityRate));
     }
 
     /// @inheritdoc BaseAdapter

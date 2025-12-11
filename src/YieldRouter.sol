@@ -92,18 +92,18 @@ contract YieldRouter is IYieldRouter, Ownable, ReentrancyGuard {
         uint256 amount
     ) external override onlyAuthorized nonReentrant returns (uint256 shares) {
         require(amount > 0, "YieldRouter: Zero amount");
-        
+
         address adapter = _vaultAdapters[vault];
         require(adapter != address(0), "YieldRouter: No adapter");
-        
+
         // Transfer tokens to router (caller must have approved)
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
-        
+
         // Approve adapter
         IERC20(token).safeIncreaseAllowance(adapter, amount);
-        
+
         // Deposit via adapter
-        shares = BaseAdapter(adapter).deposit(vault, token, amount);
+        shares = BaseAdapter(payable(adapter)).deposit(vault, token, amount);
         
         // Track deposit
         totalDeposited[vault] += amount;
@@ -117,12 +117,12 @@ contract YieldRouter is IYieldRouter, Ownable, ReentrancyGuard {
         uint256 shares
     ) external override onlyAuthorized nonReentrant returns (uint256 amount) {
         require(shares > 0, "YieldRouter: Zero shares");
-        
+
         address adapter = _vaultAdapters[vault];
         require(adapter != address(0), "YieldRouter: No adapter");
-        
+
         // Withdraw via adapter
-        amount = BaseAdapter(adapter).withdraw(vault, shares);
+        amount = BaseAdapter(payable(adapter)).withdraw(vault, shares);
         
         // Update tracked deposits
         if (totalDeposited[vault] >= amount) {
@@ -138,9 +138,9 @@ contract YieldRouter is IYieldRouter, Ownable, ReentrancyGuard {
     function harvest(address vault) external override onlyAuthorized nonReentrant returns (uint256 rewards) {
         address adapter = _vaultAdapters[vault];
         require(adapter != address(0), "YieldRouter: No adapter");
-        
+
         // Harvest via adapter
-        rewards = BaseAdapter(adapter).harvest(vault);
+        rewards = BaseAdapter(payable(adapter)).harvest(vault);
         
         // Track harvested rewards
         totalHarvested[vault] += rewards;
@@ -157,7 +157,7 @@ contract YieldRouter is IYieldRouter, Ownable, ReentrancyGuard {
         for (uint256 i = 0; i < vaults.length; i++) {
             address adapter = _vaultAdapters[vaults[i]];
             if (adapter != address(0)) {
-                uint256 rewards = BaseAdapter(adapter).harvest(vaults[i]);
+                uint256 rewards = BaseAdapter(payable(adapter)).harvest(vaults[i]);
                 totalHarvested[vaults[i]] += rewards;
                 totalRewards += rewards;
                 emit Harvested(vaults[i], rewards);
@@ -173,13 +173,13 @@ contract YieldRouter is IYieldRouter, Ownable, ReentrancyGuard {
     function emergencyWithdrawAll(address vault) external onlyOwner returns (uint256 amount) {
         address adapter = _vaultAdapters[vault];
         require(adapter != address(0), "YieldRouter: No adapter");
-        
+
         // Get total balance
-        uint256 balance = BaseAdapter(adapter).balanceOf(vault, address(this));
+        uint256 balance = BaseAdapter(payable(adapter)).balanceOf(vault, address(this));
         if (balance == 0) return 0;
-        
+
         // Withdraw all
-        amount = BaseAdapter(adapter).withdraw(vault, balance);
+        amount = BaseAdapter(payable(adapter)).withdraw(vault, balance);
         
         totalDeposited[vault] = 0;
         
@@ -213,8 +213,8 @@ contract YieldRouter is IYieldRouter, Ownable, ReentrancyGuard {
     ) external view override returns (uint256) {
         address adapter = _vaultAdapters[vault];
         if (adapter == address(0)) return 0;
-        
-        return BaseAdapter(adapter).balanceOf(vault, account);
+
+        return BaseAdapter(payable(adapter)).balanceOf(vault, account);
     }
 
     /// @notice Get APY for a vault
@@ -223,8 +223,8 @@ contract YieldRouter is IYieldRouter, Ownable, ReentrancyGuard {
     function getAPY(address vault) external view returns (uint256 apy) {
         address adapter = _vaultAdapters[vault];
         if (adapter == address(0)) return 0;
-        
-        return BaseAdapter(adapter).getAPY(vault);
+
+        return BaseAdapter(payable(adapter)).getAPY(vault);
     }
 
     /// @notice Get all registered vaults

@@ -1,0 +1,13 @@
+diff --git a/node_modules/@metamask/sdk-analytics/dist/index.js b/node_modules/@metamask/sdk-analytics/dist/index.js
+index 1234567..abcdefg 100644
+--- a/node_modules/@metamask/sdk-analytics/dist/index.js
++++ b/node_modules/@metamask/sdk-analytics/dist/index.js
+@@ -91,7 +91,7 @@ var Analytics = class {
+   constructor(baseUrl) {
+     this.enabled = false;
+     this.properties = {};
+-    const client2 = (0, import_openapi_fetch.default)({ baseUrl });
++    const client2 = typeof import_openapi_fetch.default === 'function' ? (0, import_openapi_fetch.default)({ baseUrl }) : require("openapi-fetch").default({ baseUrl });
+     const sendFn = async (batch) => {
+       const res = await client2.POST("/v1/events", { body: batch });
+       if (res.response.status !== 200) {

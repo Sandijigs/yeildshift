@@ -34,7 +34,7 @@ contract MorphoAdapter is BaseAdapter {
         address vault,
         address token,
         uint256 amount
-    ) external override returns (uint256 shares) {
+    ) external override nonReentrant whenNotPaused returns (uint256 shares) {
         require(amount > 0, "MorphoAdapter: Zero amount");
         
         IMorphoVault morphoVault = IMorphoVault(vault);
@@ -64,7 +64,7 @@ contract MorphoAdapter is BaseAdapter {
     function withdraw(
         address vault,
         uint256 shares
-    ) external override returns (uint256 amount) {
+    ) external override nonReentrant whenNotPaused returns (uint256 amount) {
         require(shares > 0, "MorphoAdapter: Zero shares");
         require(userShares[msg.sender][vault] >= shares, "MorphoAdapter: Insufficient shares");
         
@@ -80,7 +80,7 @@ contract MorphoAdapter is BaseAdapter {
     }
 
     /// @inheritdoc BaseAdapter
-    function harvest(address vault) external override returns (uint256 rewards) {
+    function harvest(address vault) external override nonReentrant whenNotPaused returns (uint256 rewards) {
         // Morpho vaults auto-compound, no separate harvest needed
         // Yield is reflected in share price appreciation
         

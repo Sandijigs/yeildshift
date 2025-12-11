@@ -229,7 +229,8 @@ contract FullFlowTest is BaseTest {
         uint256 expectedYield = (principal * apy) / 10000;
         
         console.log("Principal:", principal);
-        console.log("APY:", apy, "bps (", apy / 100, "%)");
+        console.log("APY (bps):", apy);
+        console.log("APY (%):", apy / 100);
         console.log("Expected yearly yield:", expectedYield);
         
         // Verify calculation

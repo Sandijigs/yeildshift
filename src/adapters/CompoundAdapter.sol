@@ -41,7 +41,7 @@ contract CompoundAdapter is BaseAdapter {
         address vault,
         address token,
         uint256 amount
-    ) external override returns (uint256 shares) {
+    ) external override nonReentrant whenNotPaused returns (uint256 shares) {
         require(amount > 0, "CompoundAdapter: Zero amount");
         
         IComet comet = IComet(vault);
@@ -74,7 +74,7 @@ contract CompoundAdapter is BaseAdapter {
     function withdraw(
         address vault,
         uint256 shares
-    ) external override returns (uint256 amount) {
+    ) external override nonReentrant whenNotPaused returns (uint256 amount) {
         require(shares > 0, "CompoundAdapter: Zero shares");
         require(userDeposits[msg.sender][vault] >= shares, "CompoundAdapter: Insufficient balance");
         
@@ -100,21 +100,21 @@ contract CompoundAdapter is BaseAdapter {
     }
 
     /// @inheritdoc BaseAdapter
-    function harvest(address vault) external override returns (uint256 rewards) {
+    function harvest(address vault) external override nonReentrant whenNotPaused returns (uint256 rewards) {
         // Check if rewards contract is set
         if (address(cometRewards) == address(0)) {
             emit RewardHarvested(vault, address(0), 0);
             return 0;
         }
-        
+
         // Try to claim rewards
         try cometRewards.claim(vault, address(this), true) {
-            // Get reward token info
-            ICometRewards.RewardConfig memory config = cometRewards.getRewardOwed(vault, address(this));
-            
-            if (config.token != address(0)) {
-                rewards = IERC20(config.token).balanceOf(address(this));
-                emit RewardHarvested(vault, config.token, rewards);
+            // Get reward token info - getRewardOwed returns (address token, uint256 owed)
+            (address rewardToken, uint256 owed) = cometRewards.getRewardOwed(vault, address(this));
+
+            if (rewardToken != address(0) && owed > 0) {
+                rewards = IERC20(rewardToken).balanceOf(address(this));
+                emit RewardHarvested(vault, rewardToken, rewards);
             }
         } catch {
             rewards = 0;

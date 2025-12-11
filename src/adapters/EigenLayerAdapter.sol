@@ -100,24 +100,17 @@ contract EigenLayerAdapter is BaseAdapter {
         address vault,
         address token,
         uint256 amount
-    ) external override returns (uint256 shares) {
+    ) external override nonReentrant whenNotPaused returns (uint256 shares) {
         require(_isValidLRT(vault), "EigenLayerAdapter: Invalid LRT");
         require(amount > 0, "EigenLayerAdapter: Zero amount");
-        
-        // For LRTs, we can deposit ETH or WETH
-        if (token == weth) {
-            // Transfer WETH from caller
-            IERC20(weth).safeTransferFrom(msg.sender, address(this), amount);
-            
-            // Unwrap WETH to ETH
-            (bool success,) = weth.call(abi.encodeWithSignature("withdraw(uint256)", amount));
-            require(success, "EigenLayerAdapter: WETH unwrap failed");
-        } else if (token == address(0)) {
-            // ETH deposit - already received via msg.value
-            require(msg.value == amount, "EigenLayerAdapter: ETH amount mismatch");
-        } else {
-            revert("EigenLayerAdapter: Invalid token");
-        }
+
+        // For LRTs, we only accept WETH (not raw ETH) for simplicity
+        // Transfer WETH from caller
+        IERC20(weth).safeTransferFrom(msg.sender, address(this), amount);
+
+        // Unwrap WETH to ETH
+        (bool success,) = weth.call(abi.encodeWithSignature("withdraw(uint256)", amount));
+        require(success, "EigenLayerAdapter: WETH unwrap failed");
         
         // Deposit ETH to get LRT
         shares = _depositToLRT(vault, amount);
@@ -135,7 +128,7 @@ contract EigenLayerAdapter is BaseAdapter {
     function withdraw(
         address vault,
         uint256 shares
-    ) external override returns (uint256 amount) {
+    ) external override nonReentrant whenNotPaused returns (uint256 amount) {
         require(_isValidLRT(vault), "EigenLayerAdapter: Invalid LRT");
         require(shares > 0, "EigenLayerAdapter: Zero shares");
         require(userShares[msg.sender][vault] >= shares, "EigenLayerAdapter: Insufficient shares");
@@ -159,7 +152,7 @@ contract EigenLayerAdapter is BaseAdapter {
     }
 
     /// @inheritdoc BaseAdapter
-    function harvest(address vault) external override returns (uint256 rewards) {
+    function harvest(address vault) external override nonReentrant whenNotPaused returns (uint256 rewards) {
         require(_isValidLRT(vault), "EigenLayerAdapter: Invalid LRT");
         
         // LRTs auto-compound restaking rewards into token value

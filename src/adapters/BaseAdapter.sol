@@ -51,7 +51,7 @@ abstract contract BaseAdapter is ReentrancyGuard {
         address vault,
         address token,
         uint256 amount
-    ) external virtual nonReentrant whenNotPaused returns (uint256 shares);
+    ) external virtual returns (uint256 shares);
 
     /// @notice Withdraw assets from yield source
     /// @param vault Address of the vault/protocol
@@ -60,14 +60,14 @@ abstract contract BaseAdapter is ReentrancyGuard {
     function withdraw(
         address vault,
         uint256 shares
-    ) external virtual nonReentrant whenNotPaused returns (uint256 amount);
+    ) external virtual returns (uint256 amount);
 
     /// @notice Harvest pending rewards
     /// @param vault Address of the vault/protocol
     /// @return rewards Amount of rewards harvested
     function harvest(
         address vault
-    ) external virtual nonReentrant whenNotPaused returns (uint256 rewards);
+    ) external virtual returns (uint256 rewards);
 
     /// @notice Get current APY
     /// @param vault Address of the vault/protocol
@@ -139,7 +139,7 @@ abstract contract BaseAdapter is ReentrancyGuard {
     }
 
     // ============ Receive ============
-    
+
     /// @notice Allow receiving ETH
-    receive() external payable {}
+    receive() external payable virtual {}
 }

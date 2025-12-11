@@ -18,10 +18,17 @@ import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
 contract DeployBase is Script {
     
     // ============ Base Sepolia Addresses ============
-    // Note: These are placeholder addresses - replace with actual deployed addresses
-    
-    // Uniswap v4 on Base Sepolia (update with actual address)
-    address constant POOL_MANAGER_SEPOLIA = address(0);
+    // Official Uniswap V4 deployment addresses (Dec 2025)
+
+    // Uniswap v4 on Base Sepolia (Chain ID: 84532)
+    address constant POOL_MANAGER_SEPOLIA = 0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408;
+    address constant UNIVERSAL_ROUTER_SEPOLIA = 0x492E6456D9528771018DeB9E87ef7750EF184104;
+    address constant POSITION_MANAGER_SEPOLIA = 0x4B2C77d209D3405F41a037Ec6c77F7F5b8e2ca80;
+
+    // Uniswap v4 on Base Mainnet (Chain ID: 8453)
+    address constant POOL_MANAGER_MAINNET = 0x498581fF718922c3f8e6A244956aF099B2652b2b;
+    address constant UNIVERSAL_ROUTER_MAINNET = 0x6fF5693b99212Da76ad316178A184AB56D299b43;
+    address constant POSITION_MANAGER_MAINNET = 0x7C5f5A4bBd8fD63184577525326123B519429bDc;
     
     // Yield protocols on Base (update with actual addresses)
     address constant AAVE_POOL_BASE = 0xA238Dd80C259a72e81d7e4664a9801593F98d1c5;
@@ -51,14 +58,29 @@ contract DeployBase is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         address deployer = vm.addr(deployerPrivateKey);
-        
-        // Get pool manager address from env or use default
-        address poolManager = vm.envOr("UNISWAP_V4_POOL_MANAGER", POOL_MANAGER_SEPOLIA);
-        
+
+        // Auto-detect pool manager based on chain ID
+        address poolManager;
+        address universalRouter;
+        if (block.chainid == 84532) {
+            // Base Sepolia
+            poolManager = POOL_MANAGER_SEPOLIA;
+            universalRouter = UNIVERSAL_ROUTER_SEPOLIA;
+        } else if (block.chainid == 8453) {
+            // Base Mainnet
+            poolManager = POOL_MANAGER_MAINNET;
+            universalRouter = UNIVERSAL_ROUTER_MAINNET;
+        } else {
+            // Try env variable or revert
+            poolManager = vm.envOr("UNISWAP_V4_POOL_MANAGER", address(0));
+            require(poolManager != address(0), "Unsupported chain ID - set UNISWAP_V4_POOL_MANAGER in .env");
+        }
+
         console.log("=== YieldShift Base Deployment ===");
         console.log("Deployer:", deployer);
         console.log("Chain ID:", block.chainid);
         console.log("Pool Manager:", poolManager);
+        console.log("Universal Router:", universalRouter);
         console.log("");
 
         vm.startBroadcast(deployerPrivateKey);
@@ -156,7 +178,7 @@ contract DeployBase is Script {
         if (poolManager != address(0) && address(yieldCompound) != address(0)) {
             console.log("");
             console.log("Step 5: Deploying hook and factory...");
-            
+
             yieldShiftHook = new YieldShiftHook(
                 IPoolManager(poolManager),
                 address(yieldOracle),
@@ -164,20 +186,26 @@ contract DeployBase is Script {
                 address(yieldCompound)
             );
             console.log("  YieldShiftHook:", address(yieldShiftHook));
-            
+
             yieldShiftFactory = new YieldShiftFactory(
                 poolManager,
                 address(yieldShiftHook)
             );
             console.log("  YieldShiftFactory:", address(yieldShiftFactory));
-            
+
             // Authorize hook to use router
             yieldRouter.setAuthorizedCaller(address(yieldShiftHook), true);
             console.log("  Authorized hook in router");
-            
+
             // Authorize hook to use compounder
             yieldCompound.setAuthorizedCaller(address(yieldShiftHook), true);
             console.log("  Authorized hook in compounder");
+
+            // Set Universal Router for swaps in compounder
+            if (universalRouter != address(0)) {
+                yieldCompound.setSwapRouter(universalRouter);
+                console.log("  Configured swap router:", universalRouter);
+            }
         } else {
             console.log("");
             console.log("Step 5: SKIPPED - No pool manager configured");
