@@ -47,3 +47,8 @@ coverage/
 # Slither
 slither-report/
 .vercel
+
+# Documentation (keep only README.md)
+*.md
+!README.md
+!frontend/README.md
